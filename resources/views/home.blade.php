@@ -7,6 +7,7 @@
 <!-- Contenido de la pagina -->
 @section('content')
 
+
     <h1 class="text-center">Integrador de Modelos y Simulación</h1>
 
     <h2 class="text-center"><strong>Modelo de existencia</strong></h2>
@@ -23,8 +24,6 @@
 
             <div class="text-center">
                 <a href="/simulacion" class="btn btn-primary">Simular</a>
-                <a href="/resultados" class="btn btn-primary">Resultados</a>
-
             </div>
         </div>
     </div>
