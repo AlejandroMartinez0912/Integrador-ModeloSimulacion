@@ -16,31 +16,74 @@ class NumeroController extends Controller
 
     public function generar(Request $request, GeneradorCongruenciaService $generador)
     {
-        $request->validate([
-            'v1' => 'required|numeric',
-            'v2' => 'required|numeric',
-            'm' => 'required|numeric',
-            'cantidad' => 'required|numeric',
-        ]);
+        $request->validate(
+            [
+                'v1' => 'required|numeric',
+                'v2' => 'required|numeric',
+                'm' => 'required|numeric|min:1',
+                'cantidad' => 'required|numeric|min:1|max:10000',
+            ],
+            [
+                'v1.required' => 'La semilla (X₀) es requerida.',
+                'v2.required' => 'La constante (A) es requerida.',
+                'm.required' => 'El módulo (m) es requerido.',
+                'cantidad.required' => 'La cantidad de números a generar es requerida.',
+                'v1.numeric' => 'La semilla (X₀) debe ser un número.',
+                'v2.numeric' => 'La constante (A) debe ser un número.',
+                'm.numeric' => 'El módulo (m) debe ser un número.',
+                'cantidad.numeric' => 'La cantidad de números a generar debe ser un número.',
+                'm.min' => 'El módulo (m) debe ser al menos 1.',
+                'cantidad.min' => 'La cantidad de números a generar debe ser al menos 1.',
+                'cantidad.max' => 'La cantidad de números a generar no puede exceder 10,000.',
+            ]
+        );
 
+        $x0 = (int)$request->v1;
+        $a  = (int)$request->v2;
+        $m  = (int)$request->m;
+
+        // Validación: X₀ debe ser mayor que 0 y menor que m
+        if ($x0 <= 0 || $x0 >= $m) {
+            return back()->withErrors(['v1' => 'La semilla (X₀) debe ser mayor que 0 y menor que el módulo (m).'])->withInput();
+        }
+
+        // Validación: a > 0
+        if ($a <= 0) {
+            return back()->withErrors(['v2' => 'La constante (A) debe ser mayor que 0.'])->withInput();
+        }
+
+        // Validación: a y m deben ser primos relativos
+        if ($generador->mcd($a, $m) != 1) {
+            return back()->withErrors(['v2' => 'La constante (A) y el módulo (m) deben ser primos relativos (su MCD debe ser 1).'])->withInput();
+        }
+
+
+        // Validación: evitar todos pares
+        if ($a % 2 === 0 && $x0 % 2 === 0 && $m % 2 === 0) {
+            return back()->withErrors(['v2' => 'La constante (A), el módulo (m) y la semilla (X₀) no deben ser todos pares, ya que la secuencia será pobre.'])->withInput();
+        }
+
+        // Creamos la semilla
         $semilla = Semilla::create([
-            'v1' => $request->v1,
-            'v2' => $request->v2,
-            'm' => $request->m,
+            'v1' => $x0,
+            'v2' => $a,
+            'm'  => $m,
         ]);
 
-        $numeros = $generador->generar($request->v1, $request->v2, $request->m, $request->cantidad);
+        // Generamos los números
+        $numeros = $generador->generar($x0, $a, $m, $request->cantidad);
 
         foreach ($numeros as $num) {
             Numero::create([
                 'semilla_id' => $semilla->id,
                 'resultados' => $num,
-                'test' => 'pendiente', // se actualizará luego del test chi-cuadrado
+                'test' => 'pendiente',
             ]);
         }
 
         return redirect()->route('semillas.index')->with('success', 'Números generados correctamente.');
     }
+
 
     public function listarSemillas()
     {
@@ -53,6 +96,5 @@ class NumeroController extends Controller
         $semilla = Semilla::findOrFail($id);
         $numeros = $semilla->numeros()->get();
         return view('semillas.detalles', compact('semilla', 'numeros'));
-
     }
 }

@@ -6,11 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Semilla extends Model
 {
-    //
-        protected $table = 'semillas';
+    /* Este Modelo representa la tabla 'semillas' 
+       para realizar el metodo de Congruencia Mixta
+       generar los numeros aleatorios.
+    */
+    protected $table = 'semillas';
     protected $fillable = [
-        'v1',
-        'v2',
+        'v1', // Valor 1, que es X0
+        'v2', // Valor 2, que es constante A
         'm',
     ];
 

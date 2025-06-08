@@ -17,4 +17,18 @@ class GeneradorCongruenciaService
 
         return $numeros;
     }
+
+    /**
+     * Calcula el Máximo Común Divisor (MCD) entre dos números
+     */
+    public function mcd($a, $b)
+    {
+        while ($b != 0) {
+            $temp = $b;
+            $b = $a % $b;
+            $a = $temp;
+        }
+        return $a;
+    }
+
 }
