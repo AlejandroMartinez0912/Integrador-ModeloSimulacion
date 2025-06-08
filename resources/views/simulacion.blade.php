@@ -8,7 +8,7 @@
 @section('content')
 <!-- elementos al centro -->
 
-    <div class="container mt-4"> <div class="row align-items-center"> <div class="col-auto"> <a href="/" class="btn btn-secondary">Volver</a>
+    <div class="container mt-4"> <div class="row align-items-center"> <div class="col-auto">
             </div>
 
             <div class="col text-center"> <h1>Simulación</h1>
@@ -29,7 +29,7 @@
                 <p class="text-center">Los numeros aleatorios se usan para generar la demanda y el tiempo de entrega de los pedidos</p>
             </div>
             <div class="col-md-6">
-                <a href="/numeros-aleatorios" class="btn btn-primary">Generar Numeros Aleatorios</a>
+                <a href="{{route('semillas.index')}}" class="btn btn-primary">Generar Numeros Aleatorios</a>
             </div>
         </div>
 
