@@ -3,7 +3,6 @@
 @section('title', 'Generar Números Aleatorios')
 
 @section('content')
-    <div class="container mt-4">
         <h2>Generar Números Aleatorios - Congruencia Mixta</h2>
 
         <form action="{{ route('numeros.generar') }}" method="POST">
@@ -74,5 +73,4 @@
         @endif
 
 
-    </div>
 @endsection

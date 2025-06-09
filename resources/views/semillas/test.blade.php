@@ -3,7 +3,6 @@
 @section('title', 'Resultado del Test Chi-Cuadrado')
 
 @section('content')
-<div class="container mt-4">
     <h2 class="mb-4">Resultado del Test Chi-Cuadrado</h2>
 
     <!-- Información de la semilla -->
@@ -102,5 +101,4 @@
     </div>
 
     <a href="{{ route('semillas.index') }}" class="btn btn-secondary mt-3">Volver</a>
-</div>
 @endsection

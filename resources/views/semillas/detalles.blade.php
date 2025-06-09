@@ -3,7 +3,6 @@
 @section('title', 'Detalles de Semilla')
 
 @section('content')
-    <div class="container mt-4">
 
         <h2>Detalles de la semilla #{{ $semilla->id }}</h2>
         <p><strong>V1:</strong> {{ $semilla->v1 }}</p>
@@ -35,5 +34,4 @@
         <a href="{{ route('semillas.index') }}" class="btn me-2"
             style="background-color: #a56607; color: #fff; border: none;">Volver</a>
 
-    </div>
 @endsection

@@ -197,6 +197,56 @@
 
         <!-- Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Revisa si existe un mensaje de éxito en la sesión
+                @if(Session::has('success'))
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: '{{ Session::get('success') }}',
+                        showConfirmButton: false,
+                        timer: 3000 // El mensaje desaparecerá después de 3 segundos
+                    });
+                @endif
+
+                // Revisa si existe un mensaje de error en la sesión
+                @if(Session::has('error'))
+                    Swal.fire({
+                        icon: 'error',
+                        title: '¡Error!',
+                        text: '{{ Session::get('error') }}',
+                        showConfirmButton: false,
+                        timer: 3000 // El mensaje desaparecerá después de 3 segundos
+                    });
+                @endif
+
+                // Revisa si existe un mensaje de advertencia (warning) en la sesión
+                @if(Session::has('warning'))
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '¡Advertencia!',
+                        text: '{{ Session::get('warning') }}',
+                        showConfirmButton: false,
+                        timer: 3000 // El mensaje desaparecerá después de 3 segundos
+                    });
+                @endif
+
+                // Revisa si existe un mensaje de información (info) en la sesión
+                @if(Session::has('info'))
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Información',
+                        text: '{{ Session::get('info') }}',
+                        showConfirmButton: false,
+                        timer: 3000 // El mensaje desaparecerá después de 3 segundos
+                    });
+                @endif
+            });
+        </script>
     </body>
 
 </html>

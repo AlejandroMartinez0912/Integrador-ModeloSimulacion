@@ -3,7 +3,6 @@
 @section('title', 'Listado de Semillas')
 
 @section('content')
-    <div class="container mt-4">
         <h1 class="mb-4">Semillas generadas</h1>
 
         @if (session('success'))
@@ -44,7 +43,17 @@
                                 <a href="{{ route('semillas.probar', $semilla->id) }}" class="action-btn">
                                     Probar Chi²
                                 </a>
-
+                                
+                                <!-- Si semilla paso test, se puede ver la distribucion normal -->
+                                @if ($semilla->numeros->contains(function ($numero) {
+                                    return $numero->test === 'Paso test';
+                                }))
+                                    <a href="{{ route('distribucion.index', $semilla->id) }}" class="action-btn">
+                                        <i class="fas fa-eye"></i> Distribucion Normal
+                                    </a>
+                                @endif
+                                <!-- Revisar si esta bien la condicional -->
+                                 
                             </td>
                         </tr>
                     @endforeach
@@ -57,5 +66,4 @@
         <div class="mt-4"></div>
         <!-- Botón volver -->
         <a href="/simulacion" class="btn me-2" style="background-color: #a56607; color: #fff; border: none;">Volver</a>
-    </div>
 @endsection
