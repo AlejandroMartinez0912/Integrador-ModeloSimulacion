@@ -20,6 +20,7 @@ class NumeroController extends Controller
             [
                 'v1' => 'required|numeric',
                 'v2' => 'required|numeric',
+                'c' => 'required|numeric|min:0',
                 'm' => 'required|numeric|min:1',
                 'cantidad' => 'required|numeric|min:1|max:10000',
             ],
@@ -35,12 +36,14 @@ class NumeroController extends Controller
                 'm.min' => 'El módulo (m) debe ser al menos 1.',
                 'cantidad.min' => 'La cantidad de números a generar debe ser al menos 1.',
                 'cantidad.max' => 'La cantidad de números a generar no puede exceder 10,000.',
+                'c.min' => 'La constante (C) debe ser al menos 0.',
             ]
         );
 
         $x0 = (int)$request->v1;
         $a  = (int)$request->v2;
         $m  = (int)$request->m;
+        $c  = (int)$request->c;
 
         // Validación: X₀ debe ser mayor que 0 y menor que m
         if ($x0 <= 0 || $x0 >= $m) {
@@ -52,11 +55,11 @@ class NumeroController extends Controller
             return back()->withErrors(['v2' => 'La constante (A) debe ser mayor que 0.'])->withInput();
         }
 
-        // Validación: a y m deben ser primos relativos
-        if ($generador->mcd($a, $m) != 1) {
-            return back()->withErrors(['v2' => 'La constante (A) y el módulo (m) deben ser primos relativos (su MCD debe ser 1).'])->withInput();
-        }
 
+        // Validación: c y m deben ser primos relativos
+        if ($generador->mcd($c, $m) != 1) {
+            return back()->withErrors(['c' => 'La constante (C) y el módulo (m) deben ser primos relativos (su MCD debe ser 1).'])->withInput();
+        }
 
         // Validación: evitar todos pares
         if ($a % 2 === 0 && $x0 % 2 === 0 && $m % 2 === 0) {
@@ -67,11 +70,13 @@ class NumeroController extends Controller
         $semilla = Semilla::create([
             'v1' => $x0,
             'v2' => $a,
+            'c'  => $c,
             'm'  => $m,
         ]);
 
         // Generamos los números
-        $numeros = $generador->generar($x0, $a, $m, $request->cantidad);
+        $numeros = $generador->generar($x0, $a, $c, $m, $request->cantidad);
+
 
         foreach ($numeros as $num) {
             Numero::create([
@@ -87,14 +92,18 @@ class NumeroController extends Controller
 
     public function listarSemillas()
     {
-        $semillas = Semilla::latest()->get();
-        return view('semillas.index', compact('semillas'));
+        // Obtenemos todas las semillas generadas
+        $semillas = Semilla::all();
+
+
+        return view('semillas.index', compact('semillas',));
     }
 
     public function verDetalles($id)
     {
         $semilla = Semilla::findOrFail($id);
         $numeros = $semilla->numeros()->get();
-        return view('semillas.detalles', compact('semilla', 'numeros'));
+        $estadoTest = $numeros->pluck('test')->unique()->first() ?? 'Pendiente';
+        return view('semillas.detalles', compact('semilla', 'numeros', 'estadoTest'));
     }
 }

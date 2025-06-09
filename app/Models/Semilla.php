@@ -12,9 +12,10 @@ class Semilla extends Model
     */
     protected $table = 'semillas';
     protected $fillable = [
-        'v1', // Valor 1, que es X0
-        'v2', // Valor 2, que es constante A
-        'm',
+        'v1', // V1 es la semilla inicial
+        'v2', // V2 es la constante multiplicativa
+        'c', // C es la constante aditiva
+        'm', // M es el modulo
     ];
 
     //Relacion uno a muchos con Numeros

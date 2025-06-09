@@ -25,7 +25,7 @@
                         <th>Constante A</th>
                         <th>Módulo</th>
                         <th>Generado el día</th>
-                        <th>Acción</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,6 +40,11 @@
                                 <a href="{{ route('semillas.detalles', $semilla->id) }}" class="action-btn">
                                     <i class="fas fa-eye"></i> Ver detalles
                                 </a>
+
+                                <a href="{{ route('semillas.probar', $semilla->id) }}" class="action-btn">
+                                    Probar Chi²
+                                </a>
+
                             </td>
                         </tr>
                     @endforeach

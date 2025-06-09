@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('v1');
             $table->integer('v2');
+            $table->integer('c');
             $table->integer('m');
             $table->timestamps();
         });

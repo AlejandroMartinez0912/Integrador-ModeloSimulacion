@@ -19,8 +19,16 @@
 
             <div class="mb-3">
                 <label for="v2" class="form-label">Constante A</label>
-                <input type="number" class="form-control" name="v2" value="{{old('v2')}}" required>
+                <input type="number" class="form-control" name="v2" value="{{ old('v2') }}" required>
                 @error('v2')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+                        <div class="mb-3">
+                <label for="c" class="form-label">Constante aditiva (C)</label>
+                <input type="number" class="form-control" id="c" name="c" value="{{ old('c') }}" required>
+                @error('c')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
@@ -33,9 +41,10 @@
                 @enderror
             </div>
 
+
             <div class="mb-3">
                 <label for="cantidad" class="form-label">Cantidad de Números a Generar</label>
-                <input type="number" class="form-control" name="cantidad" value="{{old('cantidad')}}" required>
+                <input type="number" class="form-control" name="cantidad" value="{{ old('cantidad') }}" required>
                 @error('cantidad')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
