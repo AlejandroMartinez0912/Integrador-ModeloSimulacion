@@ -19,9 +19,9 @@ class SemillaController extends Controller
 
         $resultado = $testService->probar($resultados);
 
-        if ($resultado) {
-            Numero::where('semilla_id', $id)->update(['test' => 'Paso test']);
-        }
+        // Actualizamos la columna "test" con el resultado
+        $estadoTexto = $resultado['pasa'] ? 'Paso test' : 'Falló test';
+        Numero::where('semilla_id', $id)->update(['test' => $estadoTexto]);
 
         return view('semillas.test', [
             'semilla' => $semilla,
