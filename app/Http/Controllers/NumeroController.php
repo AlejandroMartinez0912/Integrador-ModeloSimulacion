@@ -72,6 +72,7 @@ class NumeroController extends Controller
             'v2' => $a,
             'c'  => $c,
             'm'  => $m,
+            'cantidad' => $request->cantidad
         ]);
 
         // Generamos los números

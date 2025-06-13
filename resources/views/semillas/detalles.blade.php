@@ -11,6 +11,10 @@
         <p><strong>Estado del Test:</strong> {{ $estadoTest }}</p>
 
         <h4 class="mt-4">Números generados:</h4>
+        @if ($semilla->cantidad > 50)
+           <!--  <p>Se mostrarán los 50 primeros resultados.</p> -->
+        @endif
+        
         <table class="modern-table">
             <thead>
                 <tr>

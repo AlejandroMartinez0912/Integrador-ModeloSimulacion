@@ -16,6 +16,7 @@ class Semilla extends Model
         'v2', // V2 es la constante multiplicativa
         'c', // C es la constante aditiva
         'm', // M es el modulo
+        'cantidad',
     ];
 
     //Relacion uno a muchos con Numeros

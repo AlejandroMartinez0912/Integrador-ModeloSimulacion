@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('v2');
             $table->integer('c');
             $table->integer('m');
+            $table->integer('cantidad');
             $table->timestamps();
         });
     }

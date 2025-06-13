@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NumeroController;
 use App\Http\Controllers\SemillaController;
 use App\Http\Controllers\DistribucionNormalController;
+use App\Http\Controllers\SimularController;
 
 Route::get('/', function () {
     return view('home');
@@ -11,7 +12,7 @@ Route::get('/', function () {
 
 Route::get('/simulacion', function () {
     return view('simulacion');
-});
+})->name('simulacion');
 
 Route::prefix('simulacion')->group(function () {
     Route::get('/numeros-aleatorios', [NumeroController::class, 'index'])->name('numeros.index');
@@ -24,3 +25,8 @@ Route::prefix('simulacion')->group(function () {
     Route::get('/distribucion-normal/{id}', [DistribucionNormalController::class, 'index'])->name('distribucion.index');
 
 });
+
+// Ruta para simular el proyecto una vez cargados los numeros
+Route::get('/simular', [SimularController::class, 'index'])->name('simular.index');
+
+Route::post('/simular', [SimularController::class, 'simular'])->name('simular.simular');

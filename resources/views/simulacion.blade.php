@@ -35,34 +35,14 @@
 
         <div class="row" style="margin-top: 30px; margin-bottom: 20px ">
             <div class="col-md-6">
-                <h4 class="text-center">Stock</h4>
-                <p class="text-center">El stock se actualiza con la demanda y la venta</p>
+                <h4 class="text-center">Simular</h4>
+                <p class="text-center">Se realiza la simulacion del inventario utilizando los numeros aleatorios, la demanda y el tiempo de entrega de los pedidos</p>
             </div>
             <div class="col-md-6">
-                <a href="/stock" class="btn btn-primary">Stock</a>
+                <a href="{{route('simular.index')}}" class="btn btn-primary">Simular</a>
             </div>
         </div>
 
-        <div class="row" style="margin-top: 30px; margin-bottom: 20px ">
-            <div class="col-md-6">
-                <h4 class="text-center">Demanda</h4>
-                <p class="text-center">La demanda se actualiza con la demanda y la venta</p>
-            </div>
-            <div class="col-md-6">
-                <a href="/demanda" class="btn btn-primary">Demanda</a>
-            </div>
-        </div>
-
-        <!-- Venta -->
-         <div class="row" style="margin-top: 30px; margin-bottom: 20px ">
-            <div class="col-md-6">
-                <h4 class="text-center">Venta</h4>
-                <p class="text-center">Venta de productos</p>
-            </div>
-            <div class="col-md-6">
-                <a href="/venta" class="btn btn-primary">Venta</a>
-            </div>
-         </div>
 
     </div>
 
