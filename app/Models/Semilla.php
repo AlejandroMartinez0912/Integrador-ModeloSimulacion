@@ -29,4 +29,16 @@ class Semilla extends Model
     {
         return $this->hasMany(MarcaClase::class);
     }
+
+    // Relacion uno a uno con Pedido
+    public function pedido()
+    {
+        return $this->hasOne(Pedido::class);
+    }
+
+    // Relacion uno a uno con Demanda
+    public function demanda()
+    {
+        return $this->hasOne(Demanda::class);
+    }
 }
