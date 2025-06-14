@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Event\Code\Test;
-use app\Enums\TestSemilla;
+use App\Enums\TestSemilla;
 class Semilla extends Model
 {
     /* Este Modelo representa la tabla 'semillas' 
