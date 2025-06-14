@@ -54,10 +54,7 @@
 
 
                                 <!-- Si semilla paso test, se puede ver la distribucion normal -->
-                                @if (
-                                    $semilla->numeros->contains(function ($numero) {
-                                        return $numero->test === 'Paso test';
-                                    }))
+                                @if ($semilla->test->value == 'aprobado')
                                     <a href="{{ route('distribucion.index', $semilla->id) }}" class="action-btn">
                                         <i class="fas fa-eye"></i> Distribucion Normal
                                     </a>
