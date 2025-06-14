@@ -8,7 +8,7 @@
         <p><strong>V1:</strong> {{ $semilla->v1 }}</p>
         <p><strong>V2:</strong> {{ $semilla->v2 }}</p>
         <p><strong>M:</strong> {{ $semilla->m }}</p>
-        <p><strong>Estado del Test:</strong> {{ $estadoTest }}</p>
+        <p><strong>Estado del Test: </strong> {{ strtoupper($estadoTest) }}</p>
 
         <h4 class="mt-4">Números generados:</h4>
         @if ($semilla->cantidad > 50)

@@ -105,7 +105,7 @@ class NumeroController extends Controller
     {
         $semilla = Semilla::findOrFail($id);
         $numeros = $semilla->numeros()->get();
-        $estadoTest = $numeros->pluck('test')->unique()->first() ?? 'Pendiente';
+        $estadoTest = $semilla->test->value;
         return view('semillas.detalles', compact('semilla', 'numeros', 'estadoTest'));
     }
 }
