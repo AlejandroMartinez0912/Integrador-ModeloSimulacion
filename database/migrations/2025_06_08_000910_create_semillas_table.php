@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('c');
             $table->integer('m');
             $table->integer('cantidad');
+            $table->string('test')->default('pendiente'); // Estado del test de Chi Cuadrado
             $table->timestamps();
         });
     }

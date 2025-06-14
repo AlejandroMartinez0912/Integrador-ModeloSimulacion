@@ -3,7 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use PHPUnit\Event\Code\Test;
+use app\Enums\TestSemilla;
 class Semilla extends Model
 {
     /* Este Modelo representa la tabla 'semillas' 
@@ -17,8 +18,11 @@ class Semilla extends Model
         'c', // C es la constante aditiva
         'm', // M es el modulo
         'cantidad',
+        'test', // Estado del test de Chi Cuadrado
     ];
-
+    protected $casts = [
+        'test' => TestSemilla::class,
+    ];
     //Relacion uno a muchos con Numeros
     public function numeros()
     {

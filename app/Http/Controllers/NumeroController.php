@@ -67,14 +67,15 @@ class NumeroController extends Controller
         }
 
         // Creamos la semilla
+        //NOTA: el valor de test se inicializa como pendiente, es valor por defecto en la migracion
         $semilla = Semilla::create([
             'v1' => $x0,
             'v2' => $a,
             'c'  => $c,
             'm'  => $m,
             'cantidad' => $request->cantidad
-        ]);
-
+        ]); 
+ 
         // Generamos los números
         $numeros = $generador->generar($x0, $a, $c, $m, $request->cantidad);
 
