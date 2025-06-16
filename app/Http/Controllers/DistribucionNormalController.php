@@ -7,25 +7,19 @@ use App\Models\Numero;
 use App\Services\NormalDistributionService; // ¡IMPORTANTE: Asegúrate de importar el servicio!
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session; // Para usar las sesiones flash
-
+use App\Enums\TestSemilla; // Asegúrate de que este enum esté definido correctamente
 class DistribucionNormalController extends Controller
 {
-   
+
     public function index($id, NormalDistributionService $normalDistService) // <-- ¡Inyección del servicio aquí!
     {
         $semilla = Semilla::findOrFail($id);
         $numerosCollection = Numero::where('semilla_id', $id)->get();
         $resultadosUniforms = $numerosCollection->pluck('resultados')->toArray();
 
-        // Verificamos si la semilla (sus números) ha pasado el test de Chi-Cuadrado.
-        $pasoTest = $numerosCollection->contains(function ($numero) {
-            return $numero->test === 'Paso test';
-        });
-
-        if (!$pasoTest) {
-            // Si no pasó el test, redirigimos con un mensaje de error usando SweetAlert
+        if ($semilla->test !== TestSemilla::Aprobado) {
             Session::flash('error', 'La semilla seleccionada no ha pasado el test de Chi-Cuadrado y no puede usarse para generar demandas normales.');
-            return redirect()->route('semillas.index'); // Redirige a la lista de semillas generales
+            return redirect()->route('semillas.index');
         }
 
         // Parámetros de la distribución normal deseada para la demanda (según el enunciado del problema)
