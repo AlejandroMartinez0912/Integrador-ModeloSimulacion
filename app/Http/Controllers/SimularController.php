@@ -116,7 +116,7 @@ class SimularController extends Controller
                 ]);
 
                 if ($cantidadCubierta > 0) {
-                    Venta::create([
+                    $venta = Venta::create([
                         'demanda_id' => $demanda->id,
                         'cantidad' => $cantidadCubierta,
                         'fecha' => Carbon::now()->addDays($dia),
@@ -126,6 +126,7 @@ class SimularController extends Controller
                         'stock_id' => $stock->id,
                         'tipo' => 'egreso',
                         'cantidad' => $cantidadCubierta,
+                        'venta_id' => $venta->id,
                     ]);
 
                     $stock->decrement('cantidad', $cantidadCubierta);
