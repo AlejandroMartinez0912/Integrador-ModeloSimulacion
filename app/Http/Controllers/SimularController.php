@@ -14,23 +14,21 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
 use App\Enums\TestSemilla;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SimularController extends Controller
 {
     public function index()
     {
-        // Mostrar solo las semillas que pasaron el test
         $semillas = Semilla::where('test', 'aprobado')->get();
         return view('simular.index', compact('semillas'));
     }
 
     public function simular(Request $request)
     {
-        
         DB::beginTransaction();
 
         try {
-            
             $producto = $request->input('producto');
             $cantidadInicial = (float) $request->input('cantidad_inicial');
             $semillaId = $request->input('semilla');
@@ -42,7 +40,6 @@ class SimularController extends Controller
                 return redirect()->route('simular.index');
             }
 
-            // Crear stock inicial
             $stock = Stock::create([
                 'producto' => $producto,
                 'cantidad' => $cantidadInicial,
@@ -54,19 +51,18 @@ class SimularController extends Controller
                 'cantidad' => $cantidadInicial,
             ]);
 
-            // Obtener números pseudoaleatorios de la semilla
             $numeros = $semilla->numeros->pluck('resultados')->toArray();
 
             $demandaMedia = 150;
             $demandaDesv = 25;
             $demandaNoSatisfecha = 0;
+            $unidadesInsatisfechas = 0;
             $pedidosPendientes = [];
             $resultados = [];
 
             for ($dia = 1; $dia <= 365; $dia++) {
                 $existenciaInicialDelDia = $stock->cantidad;
 
-                // Procesar llegada de pedidos
                 foreach ($pedidosPendientes as $key => $pedidoInfo) {
                     if ($pedidoInfo['dias_restantes'] === 0) {
                         $pedido = Pedido::create([
@@ -78,7 +74,7 @@ class SimularController extends Controller
                             'demora' => $pedidoInfo['demora'],
                             'fecha' => Carbon::now()->addDays($dia),
                         ]);
-                        
+
                         Movimiento::create([
                             'stock_id' => $stock->id,
                             'tipo' => 'ingreso',
@@ -93,7 +89,6 @@ class SimularController extends Controller
                     }
                 }
 
-                // Demanda normal con método Box-Muller
                 $u = $numeros[$dia % count($numeros)];
                 $normal = $demandaMedia + $demandaDesv * sqrt(-2 * log($u)) * cos(2 * pi() * $u);
                 $cantidadDemandada = max(0, round($normal));
@@ -103,6 +98,7 @@ class SimularController extends Controller
 
                 if ($estado === 'insatisfecha') {
                     $demandaNoSatisfecha++;
+                    $unidadesInsatisfechas += ($cantidadDemandada - $cantidadCubierta);
                 }
 
                 $demanda = Demanda::create([
@@ -132,7 +128,6 @@ class SimularController extends Controller
                     $stock->decrement('cantidad', $cantidadCubierta);
                 }
 
-                // Pedido si stock < 300
                 $seHizoPedido = false;
                 $r = null;
                 $demora = null;
@@ -159,7 +154,6 @@ class SimularController extends Controller
                     ];
                 }
 
-                // Guardar en resultados para vista
                 $resultados[] = [
                     'dia' => $dia,
                     'existencia_inicial' => $existenciaInicialDelDia,
@@ -178,17 +172,48 @@ class SimularController extends Controller
 
             DB::commit();
 
-            return view('simular.resultado', [
-                'resultados' => $resultados,
-                'producto' => $producto,
-                'cantidadInicial' => $cantidadInicial,
-                'demandaNoSatisfecha' => $demandaNoSatisfecha,
-            ]);
+            // Guardar resultados en sesión
+            Session::put('resultados_simulacion', $resultados);
+            Session::put('producto', $producto);
+            Session::put('cantidadInicial', $cantidadInicial);
+            Session::put('demandaNoSatisfecha', $demandaNoSatisfecha);
+            Session::put('unidadesInsatisfechas', $unidadesInsatisfechas);
+
+            return redirect()->route('simular.resultado');
 
         } catch (\Throwable $e) {
             DB::rollBack();
             dd($e);
             return redirect()->route('simular.index')->with('error', 'Error en la simulación: ' . $e->getMessage());
         }
+    }
+
+    public function resultado(Request $request)
+    {
+        $resultados = Session::get('resultados_simulacion', []);
+        $producto = Session::get('producto');
+        $cantidadInicial = Session::get('cantidadInicial');
+        $demandaNoSatisfecha = Session::get('demandaNoSatisfecha');
+        $unidadesInsatisfechas = Session::get('unidadesInsatisfechas');
+
+        $page = LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 20;
+
+        $pagedResults = array_slice($resultados, ($page - 1) * $perPage, $perPage);
+        $paginatedResults = new LengthAwarePaginator(
+            $pagedResults,
+            count($resultados),
+            $perPage,
+            $page,
+            ['path' => route('simular.resultado')]
+        );
+
+        return view('simular.resultado', [
+            'resultados' => $paginatedResults,
+            'producto' => $producto,
+            'cantidadInicial' => $cantidadInicial,
+            'demandaNoSatisfecha' => $demandaNoSatisfecha,
+            'unidadesInsatisfechas' => $unidadesInsatisfechas,
+        ]);
     }
 }

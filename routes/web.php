@@ -30,3 +30,4 @@ Route::prefix('simulacion')->group(function () {
 Route::get('/simular', [SimularController::class, 'index'])->name('simular.index');
 
 Route::post('/simular', [SimularController::class, 'simular'])->name('simular.simular');
+Route::get('/simular/resultado', [SimularController::class, 'resultado'])->name('simular.resultado');
