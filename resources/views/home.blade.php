@@ -23,7 +23,7 @@
             </p> 
 
             <div class="text-center">
-                <a href="/simulacion" class="btn btn-primary">Simular</a>
+                <a href="/simulacion" class="btn btn-primary">Comenzar</a>
             </div>
         </div>
     </div>

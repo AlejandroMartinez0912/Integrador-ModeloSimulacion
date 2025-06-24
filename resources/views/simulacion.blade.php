@@ -11,7 +11,7 @@
     <div class="container mt-4"> <div class="row align-items-center"> <div class="col-auto">
             </div>
 
-            <div class="col text-center"> <h1>Simulación</h1>
+            <div class="col text-center"> <h1>Área de Simulación</h1>
             </div>
 
             <div class="col-auto"> </div>

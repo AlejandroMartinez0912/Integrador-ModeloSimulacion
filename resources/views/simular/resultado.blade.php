@@ -59,6 +59,22 @@
         <div class="alert alert-warning">
             <strong>Unidades totales insatisfechas:</strong> {{ $unidadesInsatisfechas }}
         </div>
+        @if (isset($recomendacionFija))
+            <div class="alert alert-success">
+                <strong>Recomendación con umbral fijo (300):</strong><br>
+                Stock inicial sugerido: {{ $recomendacionFija['stock_inicial'] }} unidades<br>
+                Unidades insatisfechas: {{ $recomendacionFija['unidades_insatisfechas'] }}
+            </div>
+        @endif
+
+        @if (isset($recomendacionUsuario))
+            <div class="alert alert-success">
+                <strong>Recomendación con umbral personalizado ({{ $recomendacionUsuario['umbral'] }}):</strong><br>
+                Stock inicial sugerido: {{ $recomendacionUsuario['stock_inicial'] }} unidades<br>
+                Unidades insatisfechas: {{ $recomendacionUsuario['unidades_insatisfechas'] }}
+            </div>
+        @endif
+
     </div>
 
     <a href="{{ route('simular.index') }}" class="btn btn-secondary mt-3">← Volver a Simular</a>

@@ -181,6 +181,12 @@ class SimularController extends Controller
             Session::put('unidadesInsatisfechas', $unidadesInsatisfechas);
             Session::put('umbralPedido', $umbralPedido);
 
+            $recomendacionFija = $this->recomendarStockInicial($semilla, 300);
+            $recomendacionUsuario = $this->recomendarStockInicial($semilla, $umbralPedido);
+
+            Session::put('recomendacionFija', $recomendacionFija);
+            Session::put('recomendacionUsuario', $recomendacionUsuario);
+
 
             return redirect()->route('simular.resultado');
         } catch (\Throwable $e) {
@@ -190,6 +196,83 @@ class SimularController extends Controller
         }
     }
 
+    private function ejecutarSimulacion($semilla, $stockInicial, $umbral)
+    {
+        $demandaMedia = 150;
+        $demandaDesv = 25;
+        $demandaNoSatisfecha = 0;
+        $unidadesInsatisfechas = 0;
+        $stock = $stockInicial;
+        $numeros = $semilla->numeros->pluck('resultados')->toArray();
+        $pedidosPendientes = [];
+
+        for ($dia = 1; $dia <= 365; $dia++) {
+            // Llegada de pedidos
+            foreach ($pedidosPendientes as $key => $pedidoInfo) {
+                if ($pedidoInfo['dias_restantes'] === 0) {
+                    $stock += $pedidoInfo['cantidad'];
+                    unset($pedidosPendientes[$key]);
+                } else {
+                    $pedidosPendientes[$key]['dias_restantes']--;
+                }
+            }
+
+            // Demanda
+            $u = $numeros[$dia % count($numeros)];
+            $normal = $demandaMedia + $demandaDesv * sqrt(-2 * log($u)) * cos(2 * pi() * $u);
+            $cantidadDemandada = max(0, round($normal));
+            $cantidadCubierta = min($cantidadDemandada, $stock);
+
+            if ($cantidadCubierta < $cantidadDemandada) {
+                $demandaNoSatisfecha++;
+                $unidadesInsatisfechas += ($cantidadDemandada - $cantidadCubierta);
+            }
+
+            $stock -= $cantidadCubierta;
+
+            // Pedido si stock bajo
+            if ($stock < $umbral) {
+                $r = mt_rand() / mt_getrandmax();
+                $demora = DemoraPedido::desdeProbabilidad($r)->value;
+
+                $promUltimos5 = array_slice($numeros, max(0, $dia - 5), 5);
+                $media = array_sum($promUltimos5) / count($promUltimos5);
+                $cantidadPedido = round($demandaMedia + $demandaDesv * sqrt(-2 * log($media)) * cos(2 * pi() * $media));
+
+                $pedidosPendientes[] = [
+                    'dias_restantes' => $demora,
+                    'cantidad' => $cantidadPedido,
+                ];
+            }
+        }
+
+        return [
+            'stock_inicial' => $stockInicial,
+            'umbral' => $umbral,
+            'demanda_insatisfecha_dias' => $demandaNoSatisfecha,
+            'unidades_insatisfechas' => $unidadesInsatisfechas,
+        ];
+    }
+
+
+    private function recomendarStockInicial($semilla, $umbral)
+    {
+        $mejorResultado = null;
+
+        for ($stock = 1000; $stock <= 60000; $stock += 1000) {
+            $resultado = $this->ejecutarSimulacion($semilla, $stock, $umbral);
+
+            if (!$mejorResultado || $resultado['unidades_insatisfechas'] < $mejorResultado['unidades_insatisfechas']) {
+                $mejorResultado = $resultado;
+            }
+        }
+
+        return $mejorResultado;
+    }
+
+
+
+
     public function resultado(Request $request)
     {
         $resultados = Session::get('resultados_simulacion', []);
@@ -198,6 +281,9 @@ class SimularController extends Controller
         $demandaNoSatisfecha = Session::get('demandaNoSatisfecha');
         $unidadesInsatisfechas = Session::get('unidadesInsatisfechas');
         $umbralPedido = Session::get('umbralPedido', 300);
+        $recomendacionFija = Session::get('recomendacionFija');
+        $recomendacionUsuario = Session::get('recomendacionUsuario');
+
 
 
         $page = LengthAwarePaginator::resolveCurrentPage();
@@ -219,6 +305,8 @@ class SimularController extends Controller
             'demandaNoSatisfecha' => $demandaNoSatisfecha,
             'unidadesInsatisfechas' => $unidadesInsatisfechas,
             'umbralPedido' => $umbralPedido,
+            'recomendacionFija' => $recomendacionFija,
+            'recomendacionUsuario' => $recomendacionUsuario,
         ]);
     }
 }

@@ -180,10 +180,13 @@
                         <a class="nav-link active" aria-current="page" href="/">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/simulacion">Simulación</a>
+                        <a class="nav-link" href="/simulacion">Área de Gestión</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('semillas.index') }}">Números Aleatorios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('simular.index') }}">Simular</a>
                     </li>
                 </ul>
             </div>
