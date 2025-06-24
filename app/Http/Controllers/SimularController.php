@@ -31,6 +31,7 @@ class SimularController extends Controller
         try {
             $producto = $request->input('producto');
             $cantidadInicial = (float) $request->input('cantidad_inicial');
+            $umbralPedido = (int) $request->input('umbral_pedido', 300);
             $semillaId = $request->input('semilla');
 
             $semilla = Semilla::findOrFail($semillaId);
@@ -134,7 +135,7 @@ class SimularController extends Controller
                 $cantidadPedido = null;
                 $diaLlegada = null;
 
-                if ($stock->cantidad < 300) {
+                if ($stock->cantidad < $umbralPedido) {
                     $seHizoPedido = true;
 
                     $r = mt_rand() / mt_getrandmax();
@@ -178,9 +179,10 @@ class SimularController extends Controller
             Session::put('cantidadInicial', $cantidadInicial);
             Session::put('demandaNoSatisfecha', $demandaNoSatisfecha);
             Session::put('unidadesInsatisfechas', $unidadesInsatisfechas);
+            Session::put('umbralPedido', $umbralPedido);
+
 
             return redirect()->route('simular.resultado');
-
         } catch (\Throwable $e) {
             DB::rollBack();
             dd($e);
@@ -195,6 +197,8 @@ class SimularController extends Controller
         $cantidadInicial = Session::get('cantidadInicial');
         $demandaNoSatisfecha = Session::get('demandaNoSatisfecha');
         $unidadesInsatisfechas = Session::get('unidadesInsatisfechas');
+        $umbralPedido = Session::get('umbralPedido', 300);
+
 
         $page = LengthAwarePaginator::resolveCurrentPage();
         $perPage = 20;
@@ -214,6 +218,7 @@ class SimularController extends Controller
             'cantidadInicial' => $cantidadInicial,
             'demandaNoSatisfecha' => $demandaNoSatisfecha,
             'unidadesInsatisfechas' => $unidadesInsatisfechas,
+            'umbralPedido' => $umbralPedido,
         ]);
     }
 }

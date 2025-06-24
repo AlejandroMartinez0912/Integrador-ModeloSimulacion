@@ -5,6 +5,9 @@
 @section('content')
 
     <h2 class="text-center mb-4">Resultado de la Simulación</h2>
+    <div class="alert alert-secondary">
+        <strong>Umbral de stock para realizar pedidos:</strong> {{ $umbralPedido }}
+    </div>
 
     <table class="table table-bordered table-hover table-sm">
         <thead class="table-dark text-center align-middle">
@@ -42,7 +45,7 @@
             @endforeach
         </tbody>
     </table>
-    
+
     <!-- Paginación -->
     <div class="d-flex justify-content-center">
         {{ $resultados->links() }}
