@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AyudaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NumeroController;
 use App\Http\Controllers\SemillaController;
@@ -23,7 +24,6 @@ Route::prefix('simulacion')->group(function () {
     Route::get('/semillas/{id}/test', [SemillaController::class, 'probarChiCuadrado'])->name('semillas.probar');
 
     Route::get('/distribucion-normal/{id}', [DistribucionNormalController::class, 'index'])->name('distribucion.index');
-
 });
 
 // Ruta para simular el proyecto una vez cargados los numeros
@@ -31,3 +31,6 @@ Route::get('/simular', [SimularController::class, 'index'])->name('simular.index
 
 Route::post('/simular', [SimularController::class, 'simular'])->name('simular.simular');
 Route::get('/simular/resultado', [SimularController::class, 'resultado'])->name('simular.resultado');
+
+Route::get('/simular/ayuda/metodo_congruencia', [AyudaController::class, 'ayudaMetodoCongruencia'])->name('ayudaMetodoCongruencia');
+Route::get('/simular/ayuda/prueba_chi_cuadrado/{id}', [AyudaController::class, 'ayudaChiCuadrado'])->name('ayudaChiCuadrado');

@@ -5,6 +5,9 @@
 @section('content')
     <div class="container mt-4 p-4 rounded-3 shadow-lg"> {{-- Agregamos container para centralizar y dar estilo --}}
         <h2 class="mb-4 text-center">Generar Números Aleatorios - Congruencia Mixta</h2>
+              <div class="text-end">
+                <a href="{{ route('ayudaMetodoCongruencia') }}" class="btn btn-primary">Ayuda de Congruencia Mixta</a>
+              </div>
 
         <form action="{{ route('numeros.generar') }}" method="POST">
             @csrf

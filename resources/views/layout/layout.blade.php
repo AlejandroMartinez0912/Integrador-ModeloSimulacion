@@ -8,7 +8,12 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css">
     <!-- Font Awesome para iconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" xintegrity="sha512-Fo3rlroqQ7G5TzU/61N+Vw4+31Fw+8z0B+P00YgM+C/A2n+Cj2n+R7S+Yk8q9u/h5X/X8z9Z2n+7z+G/2w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        xintegrity="sha512-Fo3rlroqQ7G5TzU/61N+Vw4+31Fw+8z0B+P00YgM+C/A2n+Cj2n+R7S+Yk8q9u/h5X/X8z9Z2n+7z+G/2w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
 
     {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"> --}}
 </head>
@@ -142,11 +147,13 @@
             color: #e0e0e0;
             border: none;
             border-radius: 0.5rem;
-            margin: 0 0.25rem; /* Ajuste para un espaciado más consistente */
+            margin: 0 0.25rem;
+            /* Ajuste para un espaciado más consistente */
             cursor: pointer;
             transition: all 0.2s ease;
             text-decoration: none;
-            flex-wrap: wrap; /* Permite que los botones se envuelvan en pantallas pequeñas */
+            flex-wrap: wrap;
+            /* Permite que los botones se envuelvan en pantallas pequeñas */
         }
 
         .action-btn:hover {
@@ -163,7 +170,8 @@
         .action-btn.disabled {
             opacity: 0.6;
             cursor: not-allowed;
-            pointer-events: none; /* Asegura que no sea clickable */
+            pointer-events: none;
+            /* Asegura que no sea clickable */
         }
     </style>
     <!-- Navbar -->
@@ -208,6 +216,9 @@
         </footer>
     </div>
 
+    <!-- Bootstrap JS + Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     <!-- SweetAlert2 JS -->
@@ -217,7 +228,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Revisa si existe un mensaje de éxito en la sesión
-            @if(Session::has('success'))
+            @if (Session::has('success'))
                 Swal.fire({
                     icon: 'success',
                     title: '¡Éxito!',
@@ -228,7 +239,7 @@
             @endif
 
             // Revisa si existe un mensaje de error en la sesión
-            @if(Session::has('error'))
+            @if (Session::has('error'))
                 Swal.fire({
                     icon: 'error',
                     title: '¡Error!',
@@ -239,7 +250,7 @@
             @endif
 
             // Revisa si existe un mensaje de advertencia (warning) en la sesión
-            @if(Session::has('warning'))
+            @if (Session::has('warning'))
                 Swal.fire({
                     icon: 'warning',
                     title: '¡Advertencia!',
@@ -250,17 +261,17 @@
             @endif
 
             // Revisa si existe un mensaje de información (info) en la sesión
-            @if(Session::has('info'))
+            @if (Session::has('info'))
                 Swal.fire({
                     icon: 'info',
                     title: 'Información',
                     text: '{{ Session::get('info') }}',
                     showConfirmButton: false,
                     timer: 3000 // El mensaje desaparecerá después de 3 segundos
-                    });
-                @endif
-            });
-        </script>
-    </body>
+                });
+            @endif
+        });
+    </script>
+</body>
 
 </html>

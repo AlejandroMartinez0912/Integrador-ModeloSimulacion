@@ -3,8 +3,10 @@
 @section('title', 'Resultado del Test Chi-Cuadrado')
 
 @section('content')
-    <h2 class="mb-4">Resultado del Test Chi-Cuadrado</h2>
-
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Resultado del Test Chi-Cuadrado</h2>
+        <a href="{{ route('ayudaChiCuadrado',['id'=>$semilla->id]) }}" class="btn btn-primary">Ayuda Chi cuadrado</a>
+    </div>
     <!-- Información de la semilla -->
     <div class="card mb-4">
         <div class="card-header bg-secondary text-white">
