@@ -77,6 +77,79 @@
 
     </div>
 
+    <div class="alert alert-warning mt-4">
+        @if (isset($frecuencias))
+            <div class="mt-5">
+                <h4>Frecuencias de Demanda</h4>
+                <canvas id="graficoFrecuencia" height="100"></canvas>
+            </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                const ctx = document.getElementById('graficoFrecuencia').getContext('2d');
+
+                const observadas = {!! json_encode(array_values($frecuencias['observadas'])) !!};
+                const esperadas = {!! json_encode(array_values($frecuencias['esperadas'])) !!};
+                const totalObservadas = observadas.reduce((a, b) => a + b, 0);
+                const totalEsperadas = esperadas.reduce((a, b) => a + b, 0);
+
+                const data = {
+                    labels: {!! json_encode(array_keys($frecuencias['observadas'])) !!},
+                    datasets: [{
+                            label: 'Frecuencia Observada (Simulación)',
+                            data: observadas.map(val => val / totalObservadas),
+                            borderColor: 'orange',
+                            tension: 0.4,
+                            fill: false
+                        },
+                        {
+                            label: 'Frecuencia Esperada',
+                            data: esperadas.map(val => val / totalEsperadas),
+                            borderColor: 'deepskyblue',
+                            tension: 0.4,
+                            fill: false
+                        }
+                    ]
+                };
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: data,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Comparación de Distribuciones de Probabilidad'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Intervalos de Caudal'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Probabilidad'
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            </script>
+        @endif
+    </div>
+
+
+
+
     <a href="{{ route('simular.index') }}" class="btn btn-secondary mt-3">← Volver a Simular</a>
+
+
+
 
 @endsection

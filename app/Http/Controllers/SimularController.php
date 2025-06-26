@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
 use App\Enums\TestSemilla;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Services\AnalisisFrecuenciaService;
 
 class SimularController extends Controller
 {
@@ -61,6 +62,9 @@ class SimularController extends Controller
             $pedidosPendientes = [];
             $resultados = [];
 
+            $demandaNormalTransformada = $this->boxMullerTransform($numeros, $demandaMedia, $demandaDesv);
+
+
             for ($dia = 1; $dia <= 365; $dia++) {
                 $existenciaInicialDelDia = $stock->cantidad;
 
@@ -91,7 +95,7 @@ class SimularController extends Controller
                 }
 
                 $u = $numeros[$dia % count($numeros)];
-                $normal = $demandaMedia + $demandaDesv * sqrt(-2 * log($u)) * cos(2 * pi() * $u);
+                $normal = $demandaNormalTransformada[$dia % count($demandaNormalTransformada)];
                 $cantidadDemandada = max(0, round($normal));
 
                 $cantidadCubierta = min($cantidadDemandada, $stock->cantidad);
@@ -144,7 +148,7 @@ class SimularController extends Controller
                     $promUltimos5 = array_slice($numeros, max(0, $dia - 5), 5);
                     $media = array_sum($promUltimos5) / count($promUltimos5);
 
-                    $cantidadPedido = round($demandaMedia + $demandaDesv * sqrt(-2 * log($media)) * cos(2 * pi() * $media));
+                    $cantidadPedido = round($this->boxMullerTransform([$media], $demandaMedia, $demandaDesv)[0]);
                     $diaLlegada = $dia + $demora;
 
                     $pedidosPendientes[] = [
@@ -171,30 +175,61 @@ class SimularController extends Controller
                 ];
             }
 
+            $analisis = new AnalisisFrecuenciaService();
+            $frecuencias = $analisis->obtenerFrecuencias($resultados, $demandaMedia, $demandaDesv);
+
+            $recomendacionFija = $this->recomendarStockInicial($semilla, 300);
+            $recomendacionUsuario = $this->recomendarStockInicial($semilla, $umbralPedido);
+
             DB::commit();
 
-            // Guardar resultados en sesión
             Session::put('resultados_simulacion', $resultados);
             Session::put('producto', $producto);
             Session::put('cantidadInicial', $cantidadInicial);
             Session::put('demandaNoSatisfecha', $demandaNoSatisfecha);
             Session::put('unidadesInsatisfechas', $unidadesInsatisfechas);
             Session::put('umbralPedido', $umbralPedido);
-
-            $recomendacionFija = $this->recomendarStockInicial($semilla, 300);
-            $recomendacionUsuario = $this->recomendarStockInicial($semilla, $umbralPedido);
-
             Session::put('recomendacionFija', $recomendacionFija);
             Session::put('recomendacionUsuario', $recomendacionUsuario);
-
+            Session::put('frecuencias', $frecuencias);
 
             return redirect()->route('simular.resultado');
         } catch (\Throwable $e) {
             DB::rollBack();
-            dd($e);
             return redirect()->route('simular.index')->with('error', 'Error en la simulación: ' . $e->getMessage());
         }
     }
+
+    private function boxMullerTransform(array $uniforms, float $media = 150, float $desv = 25): array
+    {
+        $normales = [];
+
+        for ($i = 0; $i < count($uniforms) - 1; $i += 2) {
+            $u1 = $uniforms[$i];
+            $u2 = $uniforms[$i + 1];
+
+            // Aseguramos que u1 nunca sea 0
+            if ($u1 <= 0.0) {
+                $u1 = 1e-10;
+            }
+
+            $z1 = sqrt(-2 * log($u1)) * cos(2 * pi() * $u2);
+            $z2 = sqrt(-2 * log($u1)) * sin(2 * pi() * $u2);
+
+            $normales[] = $media + $desv * $z1;
+            if (count($normales) < 365) {
+                $normales[] = $media + $desv * $z2;
+            }
+        }
+
+        // Si por redondeo quedan menos de 365, repetimos del principio
+        while (count($normales) < 365) {
+            $normales[] = $media;
+        }
+
+        return $normales;
+    }
+
 
     private function ejecutarSimulacion($semilla, $stockInicial, $umbral)
     {
@@ -207,7 +242,6 @@ class SimularController extends Controller
         $pedidosPendientes = [];
 
         for ($dia = 1; $dia <= 365; $dia++) {
-            // Llegada de pedidos
             foreach ($pedidosPendientes as $key => $pedidoInfo) {
                 if ($pedidoInfo['dias_restantes'] === 0) {
                     $stock += $pedidoInfo['cantidad'];
@@ -217,9 +251,8 @@ class SimularController extends Controller
                 }
             }
 
-            // Demanda
             $u = $numeros[$dia % count($numeros)];
-            $normal = $demandaMedia + $demandaDesv * sqrt(-2 * log($u)) * cos(2 * pi() * $u);
+            $normal = $this->boxMullerTransform([$u], $demandaMedia, $demandaDesv)[0];
             $cantidadDemandada = max(0, round($normal));
             $cantidadCubierta = min($cantidadDemandada, $stock);
 
@@ -230,14 +263,13 @@ class SimularController extends Controller
 
             $stock -= $cantidadCubierta;
 
-            // Pedido si stock bajo
             if ($stock < $umbral) {
                 $r = mt_rand() / mt_getrandmax();
                 $demora = DemoraPedido::desdeProbabilidad($r)->value;
 
                 $promUltimos5 = array_slice($numeros, max(0, $dia - 5), 5);
                 $media = array_sum($promUltimos5) / count($promUltimos5);
-                $cantidadPedido = round($demandaMedia + $demandaDesv * sqrt(-2 * log($media)) * cos(2 * pi() * $media));
+                $cantidadPedido = round($this->boxMullerTransform([$media], $demandaMedia, $demandaDesv)[0]);
 
                 $pedidosPendientes[] = [
                     'dias_restantes' => $demora,
@@ -254,7 +286,6 @@ class SimularController extends Controller
         ];
     }
 
-
     private function recomendarStockInicial($semilla, $umbral)
     {
         $mejorResultado = null;
@@ -270,9 +301,6 @@ class SimularController extends Controller
         return $mejorResultado;
     }
 
-
-
-
     public function resultado(Request $request)
     {
         $resultados = Session::get('resultados_simulacion', []);
@@ -283,8 +311,7 @@ class SimularController extends Controller
         $umbralPedido = Session::get('umbralPedido', 300);
         $recomendacionFija = Session::get('recomendacionFija');
         $recomendacionUsuario = Session::get('recomendacionUsuario');
-
-
+        $frecuencias = Session::get('frecuencias');
 
         $page = LengthAwarePaginator::resolveCurrentPage();
         $perPage = 20;
@@ -307,6 +334,7 @@ class SimularController extends Controller
             'umbralPedido' => $umbralPedido,
             'recomendacionFija' => $recomendacionFija,
             'recomendacionUsuario' => $recomendacionUsuario,
+            'frecuencias' => $frecuencias,
         ]);
     }
 }
