@@ -3,7 +3,7 @@
 @section('title', 'Resultado de la Simulación')
 
 @section('content')
-
+    {{-- {{dd($resultados[0]['pedido'])}} --}}
     <h2 class="text-center mb-4">Resultado de la Simulación</h2>
     <div class="alert alert-secondary">
         <strong>Umbral de stock para realizar pedidos:</strong> {{ $umbralPedido }}
@@ -36,7 +36,11 @@
                     <td>{{ number_format($fila['venta'], 2) }}</td>
                     <td>{{ number_format($fila['demanda_insatisfecha'], 2) }}</td>
                     <td>{{ number_format($fila['existencia_final'], 2) }}</td>
-                    <td class="text-center">{{ $fila['pedido'] ? '✔' : '' }}</td>
+                    <td class="text-center">
+                        {!! $fila['pedido'] === 'Sí'
+                            ? '<span title="Pedido realizado" style="color:green;">&#x1F4E6;</span>'
+                            : '<span title="Sin pedido" style="color:red;">&#x274C;</span>' !!}
+                    </td>
                     <td>{{ $fila['rand_demora'] !== null ? number_format($fila['rand_demora'], 4) : '-' }}</td>
                     <td>{{ $fila['demora'] ?? '-' }}</td>
                     <td>{{ $fila['cantidad_pedida'] !== null ? number_format($fila['cantidad_pedida'], 2) : '-' }}</td>
